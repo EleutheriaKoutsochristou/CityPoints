@@ -7,7 +7,8 @@ import com.example.citypoints.database.SustainablePoint
 import com.example.citypoints.databinding.ItemPointBinding
 
 class PointAdapter(
-    private var points: List<SustainablePoint>
+    private var points: MutableList<SustainablePoint>,
+    private val onItemClick: (SustainablePoint) -> Unit
 ) : RecyclerView.Adapter<PointAdapter.PointViewHolder>() {
 
     inner class PointViewHolder(val binding: ItemPointBinding)
@@ -30,14 +31,19 @@ class PointAdapter(
 
         holder.binding.tvTitle.text = point.title
         holder.binding.tvCategory.text = point.category
-        holder.binding.tvRating.text = point.rating.toString()
+        holder.binding.tvStatus.text = point.status
+        holder.binding.ratingBar.rating = point.rating
 
+        holder.itemView.setOnClickListener {
+            onItemClick(point)
+        }
     }
 
-    override fun getItemCount(): Int = points.size
+    override fun getItemCount() = points.size
 
-    fun updateList(newList: List<SustainablePoint>) {
-        points = newList
+    fun updateData(newList: List<SustainablePoint>) {
+        points.clear()
+        points.addAll(newList)
         notifyDataSetChanged()
     }
 }

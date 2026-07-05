@@ -5,11 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.citypoints"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.citypoints"
@@ -50,5 +46,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    implementation(libs.androidx.recyclerview)
     ksp(libs.room.compiler)
 }
