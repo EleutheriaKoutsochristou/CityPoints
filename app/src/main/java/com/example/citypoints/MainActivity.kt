@@ -8,7 +8,6 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.citypoints.databinding.ActivityMainBinding
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.room.Room
 import com.example.citypoints.adapter.PointAdapter
 import com.example.citypoints.database.AppDatabase
 import kotlinx.coroutines.launch
@@ -28,14 +27,15 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
 
         setContentView(binding.root)
-        database = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java,
-            "citypoints_db"
-        ).build()
+        database = AppDatabase.getDatabase(this)
 
         adapter = PointAdapter(mutableListOf()) { point ->
-            // Εδώ αργότερα θα ανοίγει η DetailActivity
+
+            val intent = Intent(this, DetailActivity::class.java)
+
+            intent.putExtra("pointId", point.id)
+
+            startActivity(intent)
         }
 
         binding.recyclerViewPoints.layoutManager = LinearLayoutManager(this)
@@ -46,7 +46,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        loadPoints()
+        lifecycleScope.launch {
+            database.pointDao().getAllPoints().collect { points ->
+                adapter.updateData(points)
+            }
+        }
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -55,14 +59,6 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-    override fun onResume() {
-        super.onResume()
-        loadPoints()
-    }
-    private fun loadPoints() {
-        lifecycleScope.launch {
-            val points = database.pointDao().getAllPoints()
-            adapter.updateData(points)
-        }
-    }
+    
+    // Removed onResume and loadPoints since we use Flow collect
 }

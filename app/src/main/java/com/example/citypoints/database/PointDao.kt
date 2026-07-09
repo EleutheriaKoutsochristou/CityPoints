@@ -15,5 +15,10 @@ interface PointDao {
     suspend fun delete(point: SustainablePoint)
 
     @Query("SELECT * FROM points ORDER BY id DESC")
-    suspend fun getAllPoints(): List<SustainablePoint>
+    fun getAllPoints(): kotlinx.coroutines.flow.Flow<List<SustainablePoint>>
+    @Query("SELECT * FROM points WHERE id = :id")
+    fun getPointById(id: Int): kotlinx.coroutines.flow.Flow<SustainablePoint?>
+
+    @Query("SELECT * FROM points WHERE id = :id")
+    suspend fun getPointByIdOnce(id: Int): SustainablePoint?
 }
